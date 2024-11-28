@@ -52,3 +52,68 @@ def dijkstra(grafo, inicio, destino):
     caminho.reverse()
 
     return caminho, distancias[destino]
+
+def kruskal(grafo):
+    arvore_minima = []
+    arestas = []
+    for vertice in grafo:
+        for vizinho, peso in grafo[vertice]:
+            arestas.append((peso, vertice, vizinho))
+    arestas.sort()
+
+    conjunto_disjunto = DisjointSet(grafo.keys())
+
+    for aresta in arestas:
+        peso, vertice1, vertice2 = aresta
+        if conjunto_disjunto.find(vertice1) != conjunto_disjunto.find(vertice2):
+            arvore_minima.append(aresta)
+            conjunto_disjunto.union(vertice1, vertice2)
+
+    custo_total = sum(aresta[0] for aresta in arvore_minima)  # Cálculo do custo total da árvore geradora mínima
+    return arvore_minima, custo_total
+
+def prim(grafo):
+    arvore_minima = []
+    visitados = set()
+    no_inicio = list(grafo.keys())[0]
+    visitados.add(no_inicio)
+    arestas = [(peso, no_inicio, vizinho) for vizinho, peso in grafo[no_inicio]]
+
+    while arestas:
+        arestas.sort()
+        peso, vertice1, vertice2 = arestas.pop(0)
+        if vertice2 not in visitados:
+            visitados.add(vertice2)
+            arvore_minima.append((peso, vertice1, vertice2))
+            arestas.extend((p, vertice2, vizinho) for vizinho, p in grafo[vertice2] if vizinho not in visitados)
+
+    custo_total = sum(aresta[0] for aresta in arvore_minima)  # Cálculo do custo total da árvore geradora mínima
+    return arvore_minima, custo_total
+
+def parse_graph(nome_arquivo):
+    grafo = {}
+    num_nos = 0
+    num_arestas = 0
+
+    with open(nome_arquivo, 'r') as arquivo:
+        linhas = arquivo.readlines()
+        for linha in linhas:
+            if linha.startswith('c') or not linha.strip():
+                continue
+            if linha.startswith('p'):
+                _, _, num_nos, num_arestas = linha.split()
+                num_nos = int(num_nos)
+                num_arestas = int(num_arestas)
+                for no in range(1, num_nos + 1):
+                    grafo[str(no)] = []
+            elif linha.startswith('a'):
+                partes = linha.split()
+                if len(partes) == 4:
+                    _, u, v, peso = partes
+                    u, v, peso = str(u), str(v), float(peso)
+                    if u in grafo and v in grafo:
+                        grafo[u].append((v, peso))
+                        grafo[v].append((u, peso))
+                else:
+                    print(f"Linha ignorada (formato inválido): {linha.strip()}")
+    return grafo, num_nos, num_arestas
