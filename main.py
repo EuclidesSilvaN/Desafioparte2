@@ -145,3 +145,47 @@ if __name__ == "__main__":
             caminho, custo = dijkstra(grafo, primeiro_no, ultimo_no)
             tempo_fim = time.time()
             tempo_execucao = tempo_fim - tempo_inicio
+
+            # Escreve os resultados no arquivo
+            f.write(f"Dijkstra:\n")
+            f.write(f"Caminho mínimo do nó {primeiro_no} ao nó {ultimo_no}: {' -> '.join(caminho)}\n")
+            f.write(f"Custo total: {custo:.2f}\n")
+            f.write(f"Tempo de execução: {tempo_execucao:.6f} segundos\n")
+            f.write("\n" + "="*50 + "\n\n")
+
+            print(f"Concluído para {os.path.basename(nome_arquivo)} em {tempo_execucao:.6f} segundos")
+
+            print(f"Executando leitura da rota ({os.path.basename(nome_arquivo).split('.')[0]}) com Kruskal")
+            tempo_inicio = time.time()
+
+            # Executa Kruskal
+            arvore_kruskal, custo_kruskal = kruskal(grafo)
+            f.write("Árvore Geradora Mínima (Kruskal):\n")
+            for aresta in arvore_kruskal:
+                f.write(f"{aresta[1]} - {aresta[2]} (peso: {aresta[0]})\n")
+            f.write(f"Custo total: {custo_kruskal:.2f}\n")
+            f.write("\n")
+
+            tempo_fim = time.time()
+            tempo_execucao = tempo_fim - tempo_inicio
+            f.write(f"Tempo de execução: {tempo_execucao:.6f} segundos\n")
+            f.write("\n" + "="*50 + "\n\n")
+
+            print(f"Concluído para {os.path.basename(nome_arquivo)} com Kruskal em {tempo_execucao:.6f} segundos")
+
+            print(f"Executando leitura da rota ({os.path.basename(nome_arquivo).split('.')[0]}) com Prim")
+            tempo_inicio = time.time()
+
+            # Executa Prim
+            arvore_prim, custo_prim = prim(grafo)
+            f.write("Árvore Geradora Mínima (Prim):\n")
+            for aresta in arvore_prim:
+                f.write(f"{aresta[1]} - {aresta[2]} (peso: {aresta[0]})\n")
+            f.write(f"Custo total da Árvore Geradora Mínima (Prim): {custo_prim:.2f}\n")
+
+            tempo_fim = time.time()
+            tempo_execucao = tempo_fim - tempo_inicio
+            f.write(f"Tempo de execução: {tempo_execucao:.6f} segundos\n")
+            f.write("\n" + "="*50 + "\n\n")
+
+            print(f"Concluído para {os.path.basename(nome_arquivo)} com Prim em {tempo_execucao:.6f} segundos")
