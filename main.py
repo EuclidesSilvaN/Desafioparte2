@@ -89,3 +89,59 @@ def prim(grafo):
 
     custo_total = sum(aresta[0] for aresta in arvore_minima)  # Cálculo do custo total da árvore geradora mínima
     return arvore_minima, custo_total
+    
+def parse_graph(nome_arquivo):
+    grafo = {}
+    num_nos = 0
+    num_arestas = 0
+
+    with open(nome_arquivo, 'r') as arquivo:
+        linhas = arquivo.readlines()
+        for linha in linhas:
+            if linha.startswith('c') or not linha.strip():
+                continue
+            if linha.startswith('p'):
+                _, _, num_nos, num_arestas = linha.split()
+                num_nos = int(num_nos)
+                num_arestas = int(num_arestas)
+                for no in range(1, num_nos + 1):
+                    grafo[str(no)] = []
+            elif linha.startswith('a'):
+                partes = linha.split()
+                if len(partes) == 4:
+                    _, u, v, peso = partes
+                    u, v, peso = str(u), str(v), float(peso)
+                    if u in grafo and v in grafo:
+                        grafo[u].append((v, peso))
+                        grafo[v].append((u, peso))
+                else:
+                    print(f"Linha ignorada (formato inválido): {linha.strip()}")
+    return grafo, num_nos, num_arestas
+
+# Script principal de execução
+if __name__ == "__main__":
+    # Encontrar todos os arquivos .gr na pasta data
+    pasta_data = "data"
+    grafos = [os.path.join(pasta_data, arquivo) for arquivo in os.listdir(pasta_data) if arquivo.endswith('.gr')]
+
+    # Abre arquivo de resultados para escrita
+    with open("resultados.txt", "w") as f:
+        # Percorre cada grafo encontrado
+        for nome_arquivo in grafos:
+            print(f"Executando leitura da rota ({os.path.basename(nome_arquivo).split('.')[0]}) com Dijkstra")
+            tempo_inicio = time.time()
+
+            # Parseia o grafo do arquivo
+            grafo, num_nos, num_arestas = parse_graph(nome_arquivo)
+
+            # Escreve informações básicas do grafo
+            f.write(f"Grafo: {nome_arquivo}\n")
+            f.write(f"Vértices: {num_nos}, Arestas: {num_arestas}\n\n")
+
+            # Executa Dijkstra a partir do primeiro nó para o último nó
+            primeiro_no = list(grafo.keys())[0]
+            ultimo_no = list(grafo.keys())[-1]
+
+            caminho, custo = dijkstra(grafo, primeiro_no, ultimo_no)
+            tempo_fim = time.time()
+            tempo_execucao = tempo_fim - tempo_inicio
